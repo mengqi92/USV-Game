@@ -7,7 +7,7 @@ class BasicMap(object):
   在这个简单的字符界面中"~"代表空白海面,E代表敌方舰船,F代表友方舰船'''
   def __init__(self, weight, height):
     super(BasicMap, self).__init__()
-    self.weight, self.height = weight, height
+    self.width, self.height = weight, height
     self.targetX = 0.0
     self.targetY = 0.0
     self.friendlyShips = []
@@ -30,7 +30,7 @@ class BasicMap(object):
   def __str__(self):
     _str_ = ""
 
-    matrix = [['~' for i in range(self.weight)] for j in range(self.height)]
+    matrix = [['~' for i in range(self.width)] for j in range(self.height)]
     matrix[self.targetY][self.targetX] = 'T'
     for ship in self.ships:
       shipX, shipY = ship.coordinate()
