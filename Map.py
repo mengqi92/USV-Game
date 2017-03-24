@@ -5,9 +5,9 @@ import copy
 class BasicMap(object):
   '''Map类描绘了当前整个海面上的状况
   在这个简单的字符界面中"~"代表空白海面,E代表敌方舰船,F代表友方舰船'''
-  def __init__(self, weight, height):
+  def __init__(self, width, height):
     super(BasicMap, self).__init__()
-    self.width, self.height = weight, height
+    self.width, self.height = width, height
     self.targetX = 0.0
     self.targetY = 0.0
     self.friendlyShips = []
