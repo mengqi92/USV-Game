@@ -1,4 +1,5 @@
 # coding:utf-8
+from __future__ import print_function
 
 import pygame
 from pygame.locals import *
@@ -20,7 +21,7 @@ class BasicGame(object):
         for ship in self.map.ships:
             ship.move()
         self.check_target()
-        print self.map
+        print(self.map)
 
     def check_target(self):
         target_x, target_y = self.map.target_coordinate()
@@ -35,10 +36,10 @@ class BasicGame(object):
     def start(self):
         while not self.is_game_over():
             self.update()
-            print '----------------------------------------------------------------------------------------'
-            print "press any key to continue"
+            print('----------------------------------------------------------------------------------------')
+            print("press any key to continue")
             raw_input()
-        print "you lost!"
+        print("you lost!")
 
 
 class BasicGUIGame(BasicGame):

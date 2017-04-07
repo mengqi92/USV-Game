@@ -1,4 +1,5 @@
 # coding=utf-8
+from __future__ import print_function
 
 from collections import namedtuple
 from math import sin, cos, pi
@@ -80,7 +81,7 @@ class BasicPlaneUSV(StaticUSV):
 
     def __init__(self, uid, x, y, env):
         super(BasicPlaneUSV, self).__init__(uid, x, y, env)
-        self.action_class = Action = namedtuple("action", ['stay', 'clockwise', 'angular_speed', 'speed'])
+        self.action_class = namedtuple("action", ['stay', 'clockwise', 'angular_speed', 'speed'])
 
     def decision_algorithm(self):
         '''这种USV的action对象有四个属性:1.stay,如果设为True,代表USV决定不行动,后面的参数被忽略;
@@ -148,4 +149,4 @@ class OneStepUSV(BasicPlaneUSV):
         else:
             raise Exception(
                 "OneStepUSV的direction属性应该是正交角度,然而,得到了 %f 度" % self.direction)
-        # print "我是%d号船,我现在走到了(%f,%f)"%(self.id,self.x,self.y)
+        # print("我是%d号船,我现在走到了(%f,%f)"%(self.id,self.x,self.y))

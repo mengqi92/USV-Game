@@ -1,4 +1,5 @@
 #coding:utf-8
+from __future__ import print_function
 
 from game import BasicGame
 from map_ import BasicMap
@@ -122,7 +123,7 @@ if __name__ == '__main__':
     '''开始游戏'''
     test_map = BasicMap(20,15)
     test_map.set_target(4,4)
-    # print test_map
+    # print(test_map)
 
     test_friendly_ship = MyUSV(uid=0,x=5,y=5,env=test_map)
     test_friendly_ship.set_as_friendly()
@@ -152,7 +153,7 @@ if __name__ == '__main__':
     test_enemy_ship = MyUSV(uid=8,x=10,y=10,env=test_map)
     test_enemy_ship.set_as_enemy()
     test_map.add_ship(test_enemy_ship)
-    # print test_map
+    # print(test_map)
 
     game = BasicGame()
     game.set_map(test_map)
