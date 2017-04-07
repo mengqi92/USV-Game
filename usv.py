@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 from math import sin, cos, pi
+from util import BoardAction, rotate, euclidean_distance, manhattan_distance
 # from util import PlaneAction, BoardAction
 
 
@@ -142,3 +143,72 @@ class OneStepUSV(BasicPlaneUSV):
             raise ValueError(
                 "OneStepUSV的direction属性应该是正交角度,然而,得到了 %f 度" % self.direction)
         # print("我是%d号船,我现在走到了(%f,%f)"%(self.id,self.x,self.y))
+
+
+class SimpleUSV(OneStepUSV):
+    '''一个策略简单的USV,派生自OneStepUSV'''
+    def __init__(self, uid, x, y, env):
+        super(SimpleUSV, self).__init__(uid, x, y, env)
+
+    def decision_algorithm(self):
+        if(self.is_enemy):
+            return self.attack_decision_algorithm()
+        else:
+            return self.protection_decision_algorithm()
+
+    def make_decision_by_nearest_position(self, cur_x, cur_y, cur_direction, target):
+        '''
+        在当前舰艇四个方向邻域中寻找与目标最接近的坐标，作为下一步行动目的地，返回下一步行动
+
+        param:
+            cur_x, cur_y: 舰艇当前横纵坐标
+            cur_direction: 舰艇当前朝向
+            target: 目标舰艇坐标
+        return:
+            下一步行动 BoardAction 对象
+        '''
+        # 当前舰艇的四方向邻域坐标
+        neighbors = {90: (cur_x, cur_y + 1), 180: (cur_x + 1, cur_y), 270: (cur_x, cur_y - 1), 0: (cur_x - 1, cur_y)}
+        # 可供选择的行动策略
+        strategy_options = [{'distance': manhattan_distance(target, neighbor), 'next_move': neighbor, 'angular_to_be': angular}
+                            for angular, neighbor in neighbors.items()]
+        # 寻找与目标最接近的坐标
+        nearest_strategies = sorted(strategy_options, key=lambda d: d['distance'])
+
+        for strategy in nearest_strategies:
+            if(self.is_decision_legal(*strategy['next_move'])):
+                return BoardAction(stay=False,
+                                   clockwise=(strategy['angular_to_be'] - cur_direction) > 0,
+                                   angular_speed=abs(strategy['angular_to_be'] - cur_direction))
+
+    def attack_decision_algorithm(self):
+        '''进攻方策略:在上下左右四个格子中,选择离目标最近的那个格子,如果出现相等就随机选一个;
+        如果发现目标格子被其它舰艇占用,选择次近的格子;如果全部被占用,保持不动
+        (这不见得是什么高明的策略,即是是防守方保持静止,也很有可能使进攻方进入死循环)'''
+        target = self.env.target_coordinate()
+        return self.make_decision_by_nearest_position(self.x, self.y, self.direction, target)
+
+    def protection_decision_algorithm(self):
+        '''试图出现在进攻方想要出现的那一个格子上,更具体的说,以进攻方的目标格子为"目标",实行进攻方的策略.
+        这个测试游戏里面敌舰只有一艘,所以敌人想要去的位置是确定的,如果敌人选择不动,以敌人的位置为目标位置'''
+
+        '''得到敌人的目标位置'''
+        enemy = self.env.enemy_ships[0]
+        enemy_action = enemy.attack_decision_algorithm()
+        if(enemy_action.stay):
+            target = enemy.coordinate()
+        else:
+            enemy_direction = rotate(enemy.direction,
+                                     enemy_action.angular_speed if enemy_action.clockwise else -enemy_action.angular_speed)
+
+            enemy_x, enemy_y = enemy.coordinate()
+            if(enemy_direction == 0.0):
+                target = enemy_x - 1, enemy_y
+            elif(enemy_direction == 90.0):
+                target = enemy_x, enemy_y + 1
+            elif(enemy_direction == 180.0):
+                target = enemy_x + 1, enemy_y
+            elif(enemy_direction == 270):
+                target = enemy_x, enemy_y - 1
+
+        return self.make_decision_by_nearest_position(enemy_x, enemy_y, enemy_direction, target)

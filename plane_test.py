@@ -4,6 +4,8 @@ from __future__ import print_function
 from game import BasicGUIGame
 from map_ import BasicMap
 from usv import BasicPlaneUSV
+from util import PlaneAction
+
 
 class MyUSV(BasicPlaneUSV):
   '''一个策略简单的USV,派生自OneStepUSV'''
@@ -11,8 +13,7 @@ class MyUSV(BasicPlaneUSV):
     super(MyUSV, self).__init__(uid, x, y, env)
 
   def decision_algorithm(self):
-    Action = self.action_class
-    return Action(False, False, 2.0, 1)
+    return PlaneAction(stay=False, clockwise=False, angular_speed=2.0, speed=1)
 
 if __name__ == '__main__':
     '''开始游戏'''

@@ -3,8 +3,8 @@ from __future__ import print_function
 
 import pygame
 from pygame.locals import *
-
 from time import sleep
+from six.moves import input
 
 
 class BasicGame(object):
@@ -37,7 +37,7 @@ class BasicGame(object):
             self.update()
             print('----------------------------------------------------------------------------------------')
             print("press any key to continue")
-            raw_input()
+            input()
         print("you lost!")
 
 
