@@ -26,8 +26,7 @@ class BasicGame(object):
     def check_target(self):
         target_x, target_y = self.map.target_coordinate()
         for ship in self.map.enemy_ships:
-            ship_x, ship_y = ship.coordinate()
-            if(ship_x == target_x and ship_y == target_y):
+            if((target_x, target_y) == ship.coordinate()):
                 self.is_target_safe = False
 
     def is_game_over(self):
