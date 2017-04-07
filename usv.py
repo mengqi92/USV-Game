@@ -1,8 +1,9 @@
 # coding=utf-8
 from __future__ import print_function
 
-from collections import namedtuple
 from math import sin, cos, pi
+# from util import PlaneAction, BoardAction
+
 
 class StaticUSV(object):
     """一个静态的USV类,move方法将会留空,这表示此类USV不可行动"""
@@ -55,13 +56,9 @@ class StaticUSV(object):
         '''这一函数描绘本艘USV在一单位时间内如何改变自身方向,因此其作用是在顺时针或逆时针方向上
         增加当前USV角速度的绝对值(角度变化=角速度*1时间单位=角速度的绝对值)'''
         if(clockwise):
-            self.direction += self.angular_speed
-            if(self.direction >= 360):
-                self.direction -= 360
+            self.direction = (self.direction + self.angular_speed) % 360
         else:
-            self.direction -= self.angular_speed
-            if(self.direction < 0):
-                self.direction += 360
+            self.direction = (self.direction - self.angular_speed) % 360
 
     def coordinate(self):
         '''返回本USV的位置'''
@@ -81,16 +78,14 @@ class BasicPlaneUSV(StaticUSV):
 
     def __init__(self, uid, x, y, env):
         super(BasicPlaneUSV, self).__init__(uid, x, y, env)
-        self.action_class = namedtuple("action", ['stay', 'clockwise', 'angular_speed', 'speed'])
 
     def decision_algorithm(self):
         '''这种USV的action对象有四个属性:1.stay,如果设为True,代表USV决定不行动,后面的参数被忽略;
         2.clockwise,转动方向是否是顺时针;3.angular_speed角速度;4.speed速度.
         如果stay参数为False,USV将会根据clockwise的指示转动angular_speed*t(一帧时间)度,然后前进当前的速度*t的距离'''
-        Action = self.action_class
-        example_action = Action(False, False, 20.0, 10.0)
-        example_action1 = Action(True, False, 0.0, 0.0)
-        raise Exception("请覆盖decision_algorithm方法!")
+        # traveling = PlaneAction(stay=False, clockwise=False, angular_speed=20.0, speed=10.0)
+        # anchoring = PlaneAction(stay=True, clockwise=False, angular_speed=0.0, speed=0.0)
+        raise NotImplementedError("请覆盖decision_algorithm方法!")
 
     def move(self):
         action = self.decision_algorithm()
@@ -111,14 +106,12 @@ class BasicPlaneUSV(StaticUSV):
         self.y += sin(pi * self.direction / 180) * self.speed
 
 
-
 class OneStepUSV(BasicPlaneUSV):
     """一个简单的USV类,在网格上它一次只能走动一步.每一时间单位,这种USV能够瞬时的改变自己的角速度,然后转动,最后向
     转动后的方向上移动一格."""
 
     def __init__(self, uid, x, y, env):
         super(OneStepUSV, self).__init__(uid, x, y, env)
-        self.action_class = namedtuple("action", ['stay', 'clockwise', 'angular_speed'])
         self.speed = 1
 
     def decision_algorithm(self):
@@ -126,10 +119,9 @@ class OneStepUSV(BasicPlaneUSV):
         2.clockwise,转动方向是否是顺时针;3.angular_speed角速度.
         如果stay参数为False,USV将会根据clockwise的指示转动angular_speed度,然后前进一步.注意由于
         此模型下angular_speed只能为90的倍数'''
-        Action = self.action_class
-        example_action = Action(False, False, 20.0)
-        example_action1 = Action(True, False, 0.0)
-        raise Exception("请覆盖decision_algorithm方法!")
+        # traveling = BoardAction(stay=False, clockwise=False, angular_speed=20.0)
+        # anchoring = BoardAction(stay=True, clockwise=False, angular_speed=0.0)
+        raise NotImplementedError("请覆盖decision_algorithm方法!")
 
     def move(self):
         action = self.decision_algorithm()
@@ -147,6 +139,6 @@ class OneStepUSV(BasicPlaneUSV):
         elif(self.direction == 270.0):
             self.y -= self.speed
         else:
-            raise Exception(
+            raise ValueError(
                 "OneStepUSV的direction属性应该是正交角度,然而,得到了 %f 度" % self.direction)
         # print("我是%d号船,我现在走到了(%f,%f)"%(self.id,self.x,self.y))
